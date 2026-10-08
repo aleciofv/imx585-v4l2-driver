@@ -1,75 +1,76 @@
-# Kernel Driver for IMX585
+# Driver de kernel para IMX585
 
-This guide provides detailed instructions on how to install the IMX585 kernel driver on a Linux system, specifically Raspbian.
+Este guia fornece instruções detalhadas para instalar o driver de kernel da IMX585 em um sistema Linux, especificamente no Raspbian.
 
-## Special Thanks
+## Agradecimentos
 
-Special thanks to Soho-enterprise for the additional register info.  
-Special thanks to Sasha Shturma's Raspberry Pi CM4 Сarrier with Hi-Res MIPI Display project, the DKMS install script is adapted from the github project page: https://github.com/renetec-io/cm4-panel-jdi-lt070me05000
+Agradecimentos especiais à Soho-enterprise pelas informações adicionais sobre os registradores.
 
-## Prerequisites
+Agradecimentos especiais ao projeto Raspberry Pi CM4 Carrier with Hi-Res MIPI Display, de Sasha Shturma. O script de instalação do DKMS foi adaptado do projeto no GitHub: https://github.com/renetec-io/cm4-panel-jdi-lt070me05000
 
-Before you begin the installation process, please ensure the following prerequisites are met:
+## Pré-requisitos
 
-- **Kernel version**: You should be running on a Linux kernel version 6.12 or newer. You can verify your kernel version by executing `uname -r` in your terminal.
+Antes de iniciar a instalação, verifique se os pré-requisitos a seguir foram atendidos:
 
-- **Development tools**: Essential tools such as `gcc`, `dkms`, and `linux-headers` are required for compiling a kernel module. If not already installed, these can be installed using the package manager with the following command:
+- **Versão do kernel**: É necessário usar a versão 6.12 ou mais recente do kernel Linux. Para verificar a versão do kernel, execute `uname -r` no terminal.
+
+- **Ferramentas de desenvolvimento**: Ferramentas essenciais, como `gcc`, `dkms` e `linux-headers`, são necessárias para compilar um módulo do kernel. Se ainda não estiverem instaladas, use o gerenciador de pacotes para instalá-las com o seguinte comando:
   
    ```bash 
    sudo apt install linux-headers dkms git
    ```
    
-## Installation Steps
+## Etapas da instalação
 
-### Setting Up the Tools
+### Instalação das ferramentas
 
-First, install the necessary tools (`linux-headers`, `dkms`, and `git`) if you haven't done so:
+Primeiro, instale as ferramentas necessárias (`linux-headers`, `dkms` e `git`), caso ainda não tenha feito isso:
 
 ```bash 
 sudo apt install linux-headers dkms git
 ```
 
-### Fetching the Source Code
+### Obtenção do código-fonte
 
-Clone the repository to your local machine and navigate to the cloned directory:
+Clone o repositório para sua máquina local e acesse o diretório clonado:
 
 ```bash
 git clone https://github.com/will127534/imx585-v4l2-driver.git
 cd imx585-v4l2-driver/
 ```
 
-### Compiling and Installing the Kernel Driver
+### Compilação e instalação do driver de kernel
 
-To compile and install the kernel driver, execute the provided installation script:
+Para compilar e instalar o driver de kernel, execute o script de instalação fornecido:
 
 ```bash 
 ./setup.sh
 ```
 
-### Updating the Boot Configuration
+### Atualização da configuração de inicialização
 
-Edit the boot configuration file using the following command:
+Edite o arquivo de configuração de inicialização com o seguinte comando:
 
 ```bash
 sudo nano /boot/config.txt
 ```
 
-In the opened editor, locate the line containing `camera_auto_detect` and change its value to `0`. Then, add the line `dtoverlay=imx585`. So, it will look like this:
+No editor que será aberto, localize a linha que contém `camera_auto_detect` e altere seu valor para `0`. Em seguida, adicione a linha `dtoverlay=imx585`. O resultado ficará assim:
 
 ```
 camera_auto_detect=0
 dtoverlay=imx585
 ```
 
-After making these changes, save the file and exit the editor.
+Depois de fazer essas alterações, salve o arquivo e feche o editor.
 
-Remember to reboot your system for the changes to take effect.
+Reinicie o sistema para que as alterações tenham efeito.
 
-## dtoverlay options
+## Opções de dtoverlay
 
 ### cam0
 
-If the camera is attached to cam0 port, append the dtoverlay with `,cam0` like this:  
+Se a câmera estiver conectada à porta cam0, acrescente `,cam0` ao dtoverlay, desta forma:
 ```
 camera_auto_detect=0
 dtoverlay=imx585,cam0
@@ -77,7 +78,7 @@ dtoverlay=imx585,cam0
 
 ### always-on
 
-If you want to keep the camera power always on (Useful for debugging HW issues, specifically this will set CAM_GPIO to high constantly), append the dtoverlay with `,always-on` like this:  
+Se quiser manter a câmera sempre ligada (útil para depurar problemas de hardware; essa opção mantém o CAM_GPIO constantemente em nível alto), acrescente `,always-on` ao dtoverlay, desta forma:
 ```
 camera_auto_detect=0
 dtoverlay=imx585,always-on
@@ -85,29 +86,29 @@ dtoverlay=imx585,always-on
 
 ### mono
 
-If you are using a monochrome varient, append the dtoverlay with `,mono` like this:  
+Se estiver usando uma variante monocromática, acrescente `,mono` ao dtoverlay, desta forma:
 ```
 camera_auto_detect=0
 dtoverlay=imx585,mono
 ```
 
-### Lane Count
+### Número de lanes
 
-If you want to use 2-lane for IMX585, append the dtoverlay with `,2lane` like this:  
+Para usar a IMX585 com 2 lanes, acrescente `,2lane` ao dtoverlay, desta forma:
 ```
 camera_auto_detect=0
 dtoverlay=imx585,2lane
 ```
 
-### link-frequency
+### Frequência do link
 
-If you want to change the default link frequency of 1440Mbps/lane (720Mhz), you can chage it like the following:
+Para alterar a frequência padrão do link, de 1440 Mbps/lane (720 MHz), configure-a desta forma:
 ```
 camera_auto_detect=0
 dtoverlay=imx585,link-frequency=297000000
 ```
-Here is a list of available frequencies:
-| Valid Frequency Value | Mbps/Lane | Max Framerate with 4K 12bit + 4 lane | Max Framerate with 4K 12bit + 2 lane |
+Veja a seguir a lista de frequências disponíveis:
+| Valor de frequência válido | Mbps/lane | Taxa de quadros máxima em 4K 12 bits + 4 lanes | Taxa de quadros máxima em 4K 12 bits + 2 lanes |
 | -------- | -------- | -------- | -------- |
 | 297000000|594 Mbps/Lane| 20.8 fps | 10.4 fps|
 | 360000000|720 Mbps/Lane| 25.0 fps | 12.5 fps|
@@ -117,28 +118,29 @@ Here is a list of available frequencies:
 | 891000000|1782 Mbps/Lane| 60.0 fps | 30.0 fps|
 | 1039500000|2079 Mbps/Lane| 75.0 fps | 37.5 fps|
 
-Notes that by default RPI5/RP1 has a limit of 400Mpix/s processing speed, without overclocking RP1 (hence the Camera Frontend) you will be limited to ~43.8 FPS @ 4K.  
-For ClearHDR mode the framerate will be half, for 1080P 2x2 binned the framerate will be double.  
-1188 Mhz (2376 Mbps/lane) is also in the driver but RPI4 doesn't supports it from testing and RPI5 experience framedrop.  
+Observe que, por padrão, o RPI5/RP1 tem um limite de processamento de 400 Mpix/s. Sem fazer overclock do RP1 (e, consequentemente, do Camera Frontend), a taxa ficará limitada a aproximadamente 43,8 FPS em 4K.
 
-### Sync-Mode
+No modo ClearHDR, a taxa de quadros será reduzida à metade; em 1080p com binning 2x2, ela será duplicada.
 
-The driver exposes three sync modes, selectable via dtoverlay parameters:
-| Mode                  | Description |
+A frequência de 1188 MHz (2376 Mbps/lane) também está disponível no driver, mas, nos testes, o RPI4 não oferece suporte a ela e o RPI5 apresenta perda de quadros.
+
+### Modo de sincronização
+
+O driver oferece três modos de sincronização, selecionáveis por meio dos parâmetros do dtoverlay:
+| Modo                  | Descrição |
 |-----------------------|-------------|
-| **internal-leader** (default) | Sensor runs from its own internal clock and outputs both `XVS` (vertical sync) and `XHS` (horizontal sync). Other cameras can lock onto these signals. |
-| **internal-follower** | Sensor still uses its own clock, but takes in an external `XVS` signal. It aligns vertical sync to this input by adding or subtracting a horizontal sync pulse. |
-| **external**          | Sensor clock and timing are fully driven by external `XVS` and `XHS` signals. Both syncs are inputs, no outputs are generated. |
+| **internal-leader** (padrão) | O sensor usa seu próprio clock interno e gera os sinais `XVS` (sincronização vertical) e `XHS` (sincronização horizontal). Outras câmeras podem sincronizar-se com esses sinais. |
+| **internal-follower** | O sensor continua usando seu próprio clock, mas recebe um sinal `XVS` externo. Ele alinha a sincronização vertical a essa entrada adicionando ou subtraindo um pulso de sincronização horizontal. |
+| **external**          | O clock e a temporização do sensor são controlados integralmente pelos sinais externos `XVS` e `XHS`. Ambos os sinais de sincronização são entradas; nenhum sinal é gerado como saída. |
 
-See [here](https://github.com/will127534/StarlightEye/wiki/IMX585-Camera-Clock-Synchronization-Guide) for the full guide.
+Consulte [este guia](https://github.com/will127534/StarlightEye/wiki/IMX585-Camera-Clock-Synchronization-Guide) para obter mais detalhes.
 
 
-### mix usage
+### Uso combinado
 
-Last note is that all the options can be used at the same time, the dtoverlay will looks like this:
+Por fim, todas as opções podem ser usadas ao mesmo tempo. O dtoverlay ficará assim:
 ```
 camera_auto_detect=0
 dtoverlay=imx585,mono,always-on,cam0,link-frequency=297000000
 ```
-Imaging how many config I need to test.
-
+Imagine quantas configurações preciso testar.
